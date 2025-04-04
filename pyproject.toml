@@ -1,0 +1,7 @@
+[project]
+name = "market-sanity-checker"
+version = "0.1.0"
+description = "An API/tool for comparing mainnet FiRM market deployments with ones on a forked Tenderly VNET"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
