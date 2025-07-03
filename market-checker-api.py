@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from web3 import Web3
+from web3.constants import ADDRESS_ZERO
 import os
 from decimal import Decimal
 import json
@@ -136,7 +137,7 @@ class MarketComparator:
 
         # Check if market is allowed in DBR
         try:
-            dbr = self.w3.eth.contract(address=dbr_address, abi=DBR_ABI)
+            dbr = self.w3_fork.eth.contract(address=dbr_address, abi=DBR_ABI)
             market_data["dbr_allowed"] = dbr.functions.markets(self.market_address).call()
             if not market_data["dbr_allowed"]:
                 self.add_error("Market is NOT allowed in DBR contract", "market")
@@ -164,29 +165,32 @@ class MarketComparator:
 
             if not borrow_data["is_newest"]:
                 self.add_warning("BorrowController isn't newest implementation", "borrow_controller")
-                
+
             if borrow_controller_address != borrow_controller_address_fork:
                 self.add_info(f"Borrow controller address changed from {borrow_controller_address} to {borrow_controller_address_fork}", "borrow_controller")
 
-            min_debt = borrow_controller.functions.minDebts(self.market_address).call()
-            min_debt_fork = borrow_controller_fork.functions.minDebts(self.market_address).call()
-            borrow_data["min_debt"] = {
-                "before": min_debt / 10**18,
-                "after": min_debt_fork / 10**18
-            }
-            
-            if min_debt != min_debt_fork:
-                self.add_info(f"Min debt changed from ${min_debt / 10**18} to ${min_debt_fork / 10**18}", "borrow_controller")
+            #Only compare parameters if borrow_controller_address isn't the zero address
+            if borrow_controller_address != ADDRESS_ZERO:
 
-            daily_limit = borrow_controller.functions.dailyLimits(self.market_address).call()
-            daily_limit_fork = borrow_controller_fork.functions.dailyLimits(self.market_address).call()
-            borrow_data["daily_limit"] = {
-                "before": daily_limit / 10**18,
-                "after": daily_limit_fork / 10**18
-            }
-            
-            if daily_limit != daily_limit_fork:
-                self.add_info(f"Daily limit changed from ${daily_limit / 10**18} to ${daily_limit_fork / 10**18}", "borrow_controller")
+                min_debt = borrow_controller.functions.minDebts(self.market_address).call()
+                min_debt_fork = borrow_controller_fork.functions.minDebts(self.market_address).call()
+                borrow_data["min_debt"] = {
+                    "before": min_debt / 10**18,
+                    "after": min_debt_fork / 10**18
+                }
+                
+                if min_debt != min_debt_fork:
+                    self.add_info(f"Min debt changed from ${min_debt / 10**18} to ${min_debt_fork / 10**18}", "borrow_controller")
+
+                daily_limit = borrow_controller.functions.dailyLimits(self.market_address).call()
+                daily_limit_fork = borrow_controller_fork.functions.dailyLimits(self.market_address).call()
+                borrow_data["daily_limit"] = {
+                    "before": daily_limit / 10**18,
+                    "after": daily_limit_fork / 10**18
+                }
+                
+                if daily_limit != daily_limit_fork:
+                    self.add_info(f"Daily limit changed from ${daily_limit / 10**18} to ${daily_limit_fork / 10**18}", "borrow_controller")
 
             self.results["borrow_controller"] = borrow_data
         except Exception as e:
