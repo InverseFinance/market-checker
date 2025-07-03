@@ -62,7 +62,7 @@ DBR_ABI = [
 ]
 
 # Contract addresses
-newest_borrow_controller = Web3.to_checksum_address("0x44B7895989Bc7886423F06DeAa844D413384b0d6")
+newest_borrow_controller = Web3.to_checksum_address("0x01ECA33e20a4c379Bd8A5361f896A7dd2bAE4ce8")
 newest_oracle = Web3.to_checksum_address("0xaBe146CF570FD27ddD985895ce9B138a7110cce8")
 dbr_address = Web3.to_checksum_address("0xAD038Eb671c44b853887A7E32528FaB35dC5D710")
 governor_mills = Web3.to_checksum_address("0xBeCCB6bb0aa4ab551966A7E4B97cec74bb359Bf6")
