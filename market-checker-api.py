@@ -7,6 +7,7 @@ import json
 import requests
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
+from fetch_borrows import fetch_borrows
 
 # Try to load environment variables from .env file
 load_dotenv()
@@ -63,7 +64,7 @@ DBR_ABI = [
 ]
 
 # Contract addresses
-newest_borrow_controller = Web3.to_checksum_address("0x01ECA33e20a4c379Bd8A5361f896A7dd2bAE4ce8")
+newest_borrow_controller = Web3.to_checksum_address("0xEEBea1ed06EeB120CbF72Fad195683746b5A5245")
 newest_oracle = Web3.to_checksum_address("0xaBe146CF570FD27ddD985895ce9B138a7110cce8")
 dbr_address = Web3.to_checksum_address("0xAD038Eb671c44b853887A7E32528FaB35dC5D710")
 governor_mills = Web3.to_checksum_address("0xBeCCB6bb0aa4ab551966A7E4B97cec74bb359Bf6")
@@ -354,14 +355,11 @@ class MarketComparator:
     def get_active_borrowers(self):
         """Get all active borrowers with non-zero debt"""
         try:
-            event_filter = self.market.events.Borrow.create_filter(
-                from_block=0,
-                to_block='latest'
-            )
-            borrow_events = event_filter.get_all_entries()
+            borrow_events = fetch_borrows(self.market_address)
+            print(borrow_events)
             historical_borrowers = {}
             for event in borrow_events:
-                account = event.args.account
+                account = event[0]
                 if account not in historical_borrowers:
                     debt = self.market.functions.debts(account).call()
                     historical_borrowers[account] = debt
