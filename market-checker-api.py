@@ -64,7 +64,7 @@ DBR_ABI = [
 ]
 
 # Contract addresses
-newest_borrow_controller = Web3.to_checksum_address("0xEEBea1ed06EeB120CbF72Fad195683746b5A5245")
+newest_borrow_controller = Web3.to_checksum_address("0x01ECA33e20a4c379Bd8A5361f896A7dd2bAE4ce8")
 newest_oracle = Web3.to_checksum_address("0xaBe146CF570FD27ddD985895ce9B138a7110cce8")
 dbr_address = Web3.to_checksum_address("0xAD038Eb671c44b853887A7E32528FaB35dC5D710")
 governor_mills = Web3.to_checksum_address("0xBeCCB6bb0aa4ab551966A7E4B97cec74bb359Bf6")
@@ -165,7 +165,7 @@ class MarketComparator:
             }
 
             if not borrow_data["is_newest"]:
-                self.add_warning("BorrowController isn't newest implementation", "borrow_controller")
+                self.add_warning(f"BorrowController isn't newest implementation, newest BorrowController at {newest_borrow_controller}", "borrow_controller")
 
             if borrow_controller_address != borrow_controller_address_fork:
                 self.add_info(f"Borrow controller address changed from {borrow_controller_address} to {borrow_controller_address_fork}", "borrow_controller")
@@ -356,7 +356,6 @@ class MarketComparator:
         """Get all active borrowers with non-zero debt"""
         try:
             borrow_events = fetch_borrows(self.market_address)
-            print(borrow_events)
             historical_borrowers = {}
             for event in borrow_events:
                 account = event[0]

@@ -85,7 +85,6 @@ def fetch_logs_by_signature(address: str, from_block: int, to_block: int, topic0
         if not result:
             break
         logs.extend(result)
-        print(f"Page {page}: {len(result)} logs")
         time.sleep(RPS_SLEEP)
         if len(result) < PAGE_SIZE:
             break
@@ -118,19 +117,15 @@ def decode_borrow(log):
     return borrower, amount
 
 def fetch_borrows(contract: str):
-    if "YOUR_ETHERSCAN_KEY" in ETHERSCAN_API_KEY:
+    if not ETHERSCAN_API_KEY:
         raise SystemExit("Set ETHERSCAN_API_KEY to your real key.")
 
     topic0 = compute_topic0(EVENT_SIGNATURE)
-    print(f"topic0 for '{EVENT_SIGNATURE}': {topic0}")
 
-    print(f"Resolving creation block for {CONTRACT_ADDRESS} on chainId={CHAIN_ID}...")
     creation_block = get_creation_block(contract)
     latest_block = get_latest_block()
-    print(f"Creation block: {creation_block}, latest: {latest_block}")
 
     logs = fetch_logs_by_signature(contract, creation_block, latest_block, topic0)
-    print(f"\nTotal logs fetched: {len(logs)}")
     # Peek a few results
     return [decode_borrow(l) for l in logs]
 
